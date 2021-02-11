@@ -11,4 +11,4 @@ pandas>=0.19
 fbprophet==0.7.1
 stqdm==0.0.3
 numpy==1.18.1
-
+Keras==2.4.3

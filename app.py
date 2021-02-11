@@ -19,7 +19,7 @@ def get_table_download_link(df,filename):
     in:  dataframe
     out: href string
     """
-    csv = df.to_csv(index=False)
+    csv = df.to_csv()
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     return f'<a href="data:file/csv;base64,{b64}" download="{filename}.csv">Download csv file</a>'
 
@@ -123,8 +123,11 @@ def main():
 
 
 if __name__ == '__main__':
+	try:
 	
-	main()
+		main()
+	except:
+		pass
 	
 	     
 
