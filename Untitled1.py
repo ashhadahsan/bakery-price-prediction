@@ -8,8 +8,6 @@ import streamlit.components.v1 as stc
 from time import sleep
 import pandas as pd
 import numpy as np
-import time
-from tqdm import tqdm
 from datetime import datetime
 import os
 import joblib
@@ -18,21 +16,19 @@ from sklearn.preprocessing import StandardScaler
 import base64
 from sklearn.preprocessing import LabelEncoder
 
-from keras.models import Sequential
-from keras.layers import LSTM
-from keras.layers import Dense
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import Dense
 from time import sleep
 from pandas.tseries.offsets import DateOffset
-from keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 
 import pandas as pd
 import numpy as np
 import time
-from tqdm import tqdm
 from datetime import datetime
 import os
-import joblib
-import uuid
+
 from sklearn.preprocessing import LabelEncoder
 from numpy import hstack
 import base64
