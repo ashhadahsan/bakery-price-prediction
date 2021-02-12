@@ -65,47 +65,41 @@ def main():
             df2=df2.drop('Date',axis=1)
             y=df2.val.values
             X=df2.drop('val',axis=1)
-            scaler=StandardScaler()
             # X=scaler.fit_transform(X)
-            X_train=X.values
+            X_train=np.array(X.values)
             d=[df.index[-1] + DateOffset(days=x) for x in range(0,1) ] *len(df2.Item.unique().tolist())
             df_seven_days = pd.DataFrame({'Item':df2.Item.unique(),'Date':d})
             df_seven_days['Year']= df_seven_days.Date.dt.year
             df_seven_days['Month']=df_seven_days.Date.dt.month
             dates_daily=df_seven_days.Date
             df_seven_days = df_seven_days.drop('Date',axis=1)
+
             x_train = X_train.reshape(-1, 1, X_train.shape[1])
             model = Sequential()
+            
             model.add(LSTM(100,activation='relu',return_sequences=False,input_shape=(x_train.shape[1],x_train.shape[2])))
             # model.add(Dropout(0.5))
             # model.add(Dense(100, activation='relu'))
+
             model.add(Dense(1))
             model.compile(loss='mse', optimizer='nadam')
 
-            red_lr= ReduceLROnPlateau(monitor='loss',patience=3,verbose=0,factor=0.1) #define early stop criteria
+            red_lr= ReduceLROnPlateau(monitor='loss',patience=3,verbose=1,factor=0.1) #define early stop criteria
+            with st.spinner(text="Please wait"):
+                model.fit(x_train,y,epochs=100,callbacks=[red_lr],batch_size=10,verbose=1)
+                st.success("Done ")
 
-            with st.spinner('Training may take a while'):
-                model.fit(x_train,y,epochs=200,callbacks=red_lr,batch_size=10,verbose=0)
             df_seven_days_array = df_seven_days.values
-
             preds = model.predict(df_seven_days_array.reshape(-1,1,df_seven_days_array.shape[1]))*np.random.randint(2,7)
             df_seven_days['preds']=abs(preds).astype('int')
             df_seven_days['Date']=dates_daily
-            # In[476]:
-
 
             df_seven_days['Item'] =lbl.inverse_transform(df_seven_days.Item)
+            df_seven_days.drop(columns=['Year','Month'],inplace=True)
             dateee=datetime.now().strftime(r'%Y-%m-%d ')
             dateee=dateee+"daily"
             st.markdown(get_table_download_link(df_seven_days,dateee), unsafe_allow_html=True)
-            st.write("Calculating predictions for the next 7 days")
-
-
-
-
-
-# In[478]:
-
+            st.write("Calculating for next 7 days ")
 
             preds = [df.index[-1] + DateOffset(days=x) for x in range(0,8) ][1:] * len(df2.Item.unique().tolist())
             preds = pd.DataFrame({'Date':preds})
@@ -126,35 +120,22 @@ def main():
 
             preds = preds.drop('Date',axis=1)
             preds_array=preds.values
-
-
-# In[479]:
-
-
             preds_wek = model.predict(preds_array.reshape(-1,1,preds_array.shape[1]))*np.random.randint(2,7)
-
-
-            # In[480]:
-
-
             preds['preds']=0
             preds['preds']=preds_wek.astype('int')
             preds['Date']=dates_week
-            preds.drop(['Year','Month'],axis=1)
-
-
-            # In[481]:
-
-
             preds['Items']=lbl.inverse_transform(preds['Items'])
-            
+            preds.drop(columns=['Year','Month'],inplace=True)
             dateee=datetime.now().strftime(r'%Y-%m-%d ')
             dateee=dateee+"next week"
             st.markdown(get_table_download_link(preds,dateee), unsafe_allow_html=True)
 
-
-
-
-
-
-    
+            # preds #save
+if __name__ == '__main__':
+	try:
+	
+		main()
+	except:
+		pass
+	
+	     
